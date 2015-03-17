@@ -4,6 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/home/mai/workspace/twitter4j-4.0.2/lib/twitter4j-examples-4.0.2.jar" sourcepath="/home/mai/workspace/twitter4j-4.0.2/twitter4j-examples"/>
 	<classpathentry kind="lib" path="/home/mai/workspace/twitter4j-4.0.2/lib/twitter4j-stream-4.0.2.jar"/>
-	<classpathentry kind="lib" path="/home/mai/workspace/twitter4j-4.0.2/lib/twitter4j-core-4.0.2.jar"/>
+	<classpathentry kind="lib" path="/home/mai/workspace/twitter4j-4.0.2/lib/twitter4j-core-4.0.2.jar" sourcepath="/home/mai/workspace/twitter4j-4.0.2/twitter4j-core"/>
+	<classpathentry kind="lib" path="/home/mai/Downloads/mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
