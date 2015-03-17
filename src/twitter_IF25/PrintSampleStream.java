@@ -36,9 +36,13 @@ public final class PrintSampleStream {
         StatusListener listener = new StatusListener() {
             @Override
             public void onStatus(Status status) {
+<<<<<<< HEAD
                 //System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
                 System.out.println(status);
 
+=======
+                System.out.println("@" + status.getUser().getScreenName() + " - " + status.getText());
+>>>>>>> 00e44b157ad6faaed8797e89dedb458153bfc226
             }
 
             @Override
