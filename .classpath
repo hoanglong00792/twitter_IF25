@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="/home/mai/Downloads/mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry kind="lib" path="/home/mai/Downloads/commons-lang-2.6/commons-lang-2.6.jar"/>
 	<classpathentry kind="lib" path="/home/mai/Downloads/TDA/TwitterDataAnalytics/lib/json.jar"/>
+	<classpathentry kind="lib" path="/home/mai/Downloads/mongo-java-driver-3.0.0-rc1.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
