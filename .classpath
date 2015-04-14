@@ -6,8 +6,11 @@
 	<classpathentry kind="lib" path="/home/mai/workspace/twitter4j-4.0.2/lib/twitter4j-stream-4.0.2.jar"/>
 	<classpathentry kind="lib" path="/home/mai/workspace/twitter4j-4.0.2/lib/twitter4j-core-4.0.2.jar" sourcepath="/home/mai/workspace/twitter4j-4.0.2/twitter4j-core"/>
 	<classpathentry kind="lib" path="/home/mai/Downloads/mysql-connector-java-5.0.8/mysql-connector-java-5.0.8-bin.jar"/>
-	<classpathentry kind="lib" path="/home/mai/Downloads/commons-lang-2.6/commons-lang-2.6.jar"/>
 	<classpathentry kind="lib" path="/home/mai/Downloads/TDA/TwitterDataAnalytics/lib/json.jar"/>
 	<classpathentry kind="lib" path="/home/mai/Downloads/mongo-java-driver-3.0.0-rc1.jar"/>
+	<classpathentry kind="lib" path="/home/mai/Downloads/commons-lang-2.6/commons-lang-2.6.jar"/>
+	<classpathentry kind="lib" path="/home/mai/Downloads/org.jzy3d-0.9-tutorials/lib/org.jzy3d-0.9.jar"/>
+	<classpathentry kind="lib" path="/home/mai/Downloads/org.jzy3d-0.9-tutorials/lib/jogl2-rc10/jogl-all.jar"/>
+	<classpathentry kind="lib" path="/home/mai/Downloads/org.jzy3d-0.9-tutorials/lib/jogl2-rc10/gluegen-rt.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
