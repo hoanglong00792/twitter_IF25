@@ -37,7 +37,8 @@ public class Fenetre extends JFrame {
 	private JButton startBouton_analyse = new JButton("Démarrer");
 	private JButton cancelBouton_analyse = new JButton("Arrêter");
 	private JButton startBouton_statistique = new JButton("Mettre à jour");
-	
+	private JButton startBouton_visualisation = new JButton("Mettre à jour");
+	private JPanel panDroite;
 	public Fenetre() {
 		AnalyseData analyse = new AnalyseData();
 		//StreamTweets stream = new StreamTweets();
@@ -196,14 +197,32 @@ public class Fenetre extends JFrame {
         updater.start();
 
 		// DROITE
-		JPanel panDroite = new JPanel();
+		panDroite = new JPanel();
 		panDroite.setPreferredSize(new Dimension(480, 480));
 		panDroite.setBorder(BorderFactory.createTitledBorder("Visualisation"));
+
+        panDroite.add(startBouton_visualisation);
+        mettre_a_jour_graph();
+        startBouton_visualisation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {				
+				mettre_a_jour_graph();
+			}
+		});
+        
+		this.getContentPane().add(panDroite, BorderLayout.EAST);
+		this.getContentPane().add(panCentre, BorderLayout.SOUTH);
+		this.getContentPane().add(panGauche, BorderLayout.WEST);
+
+		this.setVisible(true);
+
+	}
+	
+	public void mettre_a_jour_graph(){
 
 		Visualisation visualisation=new Visualisation();
 		visualisation.getVisualisation();
 		
-		int size = statistique.count_user;
+		int size = visualisation.count_user;
         double x;
         double y;
         double z;
@@ -218,7 +237,8 @@ public class Fenetre extends JFrame {
 //            z = (float)Math.random() - 0.5f;
         	x=visualisation.agressiveness[i];
         	y=visualisation.visibility[i];
-        	z=visualisation.danger[i];
+        	//z=visualisation.danger[i];
+        	z = (float)Math.random() - 0.5f;
             points[i] = new Coord3d(x, y, z);
             a = 0.25f;
             colors[i] = new Color(255, 0, 0);
@@ -231,14 +251,7 @@ public class Fenetre extends JFrame {
         Component com=(Component)chart.getCanvas();
         com.setPreferredSize(new Dimension(320, 320));
         System.out.println(com.getPreferredSize());
-        panDroite.add(com, BorderLayout.CENTER);
-        
-		this.getContentPane().add(panDroite, BorderLayout.EAST);
-		this.getContentPane().add(panCentre, BorderLayout.SOUTH);
-		this.getContentPane().add(panGauche, BorderLayout.WEST);
-
-		this.setVisible(true);
-
+        panDroite.add(com, BorderLayout.EAST);		
 	}
 
 	public static void main(String[] args) {

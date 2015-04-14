@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 
 public class Visualisation {
 	public double[] agressiveness, visibility, danger;
+	public int count_user;
 
 	public void getVisualisation() {
 		MongoClient mongoClient = new MongoClient("localhost");
@@ -34,15 +35,15 @@ public class Visualisation {
 		DBCollection coll_users = db.getCollection("users");
 		DBCursor cursor_user = coll_users.find();
 		int count = 0;
-		int count_user=(int)coll_users.getCount();
+		count_user=(int)coll_users.getCount();
 		agressiveness=new double[count_user];
 		visibility=new double[count_user];
 		danger=new double[count_user];
+		System.out.println(count_user);
 		try {
 			while (cursor_user.hasNext()) {
-				count++;
 				BasicDBObject user = (BasicDBObject) cursor_user.next();
-				System.out.println(count+"a"+user.toString());
+				//System.out.println(count+"a"+user.toString());
 				if (user.get("agressiveness") == null) {
 					agressiveness[count] = 0;
 				} else {					
@@ -58,6 +59,7 @@ public class Visualisation {
 				} else {
 					danger[count] = (double) user.get("danger");
 				}
+				count++;
 			}
 		} finally {
 			cursor_user.close();

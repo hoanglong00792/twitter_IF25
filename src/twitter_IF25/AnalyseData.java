@@ -102,7 +102,7 @@ public class AnalyseData extends Observable implements Runnable  {
 				count_hashtag = count_hashtag
 						+ (int) user_old.get("count_hashtag");
 				count_malware_link = (int) user_old.get("count_malware_link");
-				System.out.println("+++++++++++++++++" + user_old);
+				//System.out.println("+++++++++++++++++" + user_old);
 				coll_users.remove(user_old);
 			}
 		} finally {
@@ -112,8 +112,8 @@ public class AnalyseData extends Observable implements Runnable  {
 
 		double visibility = (count_hashtag / count_tweet_analysed * 11.6 + count_mention
 				/ count_tweet_analysed * 11.4) / 140;
-		System.out.println(visibility + "**" + count_hashtag + "-"
-				+ count_mention + ":	" + text);
+//		System.out.println(visibility + "**" + count_hashtag + "-"
+//				+ count_mention + ":	" + text);
 
 		new_user.setVisibility(visibility);
 		new_user.setCount_hashtag(count_hashtag);
