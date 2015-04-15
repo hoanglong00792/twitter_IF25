@@ -237,8 +237,7 @@ public class Fenetre extends JFrame {
 //            z = (float)Math.random() - 0.5f;
         	x=visualisation.agressiveness[i];
         	y=visualisation.visibility[i];
-        	//z=visualisation.danger[i];
-        	z = (float)Math.random() - 0.5f;
+        	z=visualisation.danger[i];
             points[i] = new Coord3d(x, y, z);
             a = 0.25f;
             colors[i] = new Color(255, 0, 0);
