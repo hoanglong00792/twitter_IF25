@@ -46,7 +46,7 @@ public class StreamTweets extends Observable implements Runnable {
 		StatusListener listener = new StatusListener() {
 			@Override
 			public void onStatus(Status tweet) {
-				System.out.println(TwitterObjectFactory.getRawJSON(tweet));
+				//System.out.println(TwitterObjectFactory.getRawJSON(tweet));
 				// StreamTweets.write(TERM + ".json",
 				// TwitterObjectFactory.getRawJSON(status));
 				DBObject dbObject = (DBObject) JSON.parse(TwitterObjectFactory

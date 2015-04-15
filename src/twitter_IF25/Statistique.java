@@ -37,7 +37,7 @@ public class Statistique  {
 		// "JackiePollaert");
 		DBCollection coll_users = db.getCollection("users");
 		BasicDBObject notQuery = new BasicDBObject();
-		notQuery.put("read", new BasicDBObject("$exists", false));
+		notQuery.put("read", new BasicDBObject("$exists", true));
 		count=(int)coll_tweets.getCount();
 		count_user=(int)coll_users.getCount();
 		count_analysed=(int)coll_tweets.getCount(notQuery);

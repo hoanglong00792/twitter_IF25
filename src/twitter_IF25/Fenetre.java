@@ -27,9 +27,8 @@ import org.jzy3d.maths.Coord3d;
 import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
-
 public class Fenetre extends JFrame {
-	private Thread thread_rest,thread_stream,thread_analyse;
+	private Thread thread_rest, thread_stream, thread_analyse;
 	private JButton startBouton_rest = new JButton("Démarrer");
 	private JButton cancelBouton_rest = new JButton("Arrêter");
 	private JButton startBouton_stream = new JButton("Démarrer");
@@ -38,10 +37,16 @@ public class Fenetre extends JFrame {
 	private JButton cancelBouton_analyse = new JButton("Arrêter");
 	private JButton startBouton_statistique = new JButton("Mettre à jour");
 	private JButton startBouton_visualisation = new JButton("Mettre à jour");
-	private JPanel panDroite;
+	private JPanel panDroite, panGauche, panCentre, panRest, panstream,
+			pananalyse;
+	private Component com;
+	private Timer updater;
+	private JTextField mot_cle;
+	private JLabel mot_cle_Label;
+
 	public Fenetre() {
 		AnalyseData analyse = new AnalyseData();
-		//StreamTweets stream = new StreamTweets();
+		// StreamTweets stream = new StreamTweets();
 		this.setTitle("IF25");
 		this.setSize(720, 480);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -50,17 +55,17 @@ public class Fenetre extends JFrame {
 
 		// GAUCHE
 
-		JLabel mot_cle_Label = new JLabel("Mot clé :");
-		final JTextField mot_cle = new JTextField();
+		mot_cle_Label = new JLabel("Mot clé :");
+		mot_cle = new JTextField();
 		mot_cle.setPreferredSize(new Dimension(100, 25));
 
-		JPanel panGauche = new JPanel();
+		panGauche = new JPanel();
 		panGauche.setPreferredSize(new Dimension(240, 120));
 		panGauche.setBorder(BorderFactory.createTitledBorder("Actions"));
 
 		// REST
 		cancelBouton_rest.setEnabled(false);
-		JPanel panRest = new JPanel();
+		panRest = new JPanel();
 		panRest.setBorder(BorderFactory.createTitledBorder("REST API"));
 		panRest.setPreferredSize(new Dimension(220, 90));
 		panRest.add(mot_cle_Label);
@@ -99,7 +104,7 @@ public class Fenetre extends JFrame {
 
 		// STREAM
 		cancelBouton_stream.setEnabled(false);
-		JPanel panstream = new JPanel();
+		panstream = new JPanel();
 		panstream.setBorder(BorderFactory.createTitledBorder("STREAM API"));
 		panstream.setPreferredSize(new Dimension(220, 60));
 		panstream.add(startBouton_stream);
@@ -113,7 +118,7 @@ public class Fenetre extends JFrame {
 				// guiAccuei-l.setVisible(true);
 				cancelBouton_stream.setEnabled(false);
 				startBouton_stream.setEnabled(true);
-				//thread_stream.suspend();
+				// thread_stream.suspend();
 				StreamTweets stream = new StreamTweets(false);
 				thread_stream = new Thread(stream);
 				thread_stream.start();
@@ -136,7 +141,7 @@ public class Fenetre extends JFrame {
 
 		// ANALYSE
 		cancelBouton_analyse.setEnabled(false);
-		JPanel pananalyse = new JPanel();
+		pananalyse = new JPanel();
 		pananalyse.setBorder(BorderFactory.createTitledBorder("ANALYSE API"));
 		pananalyse.setPreferredSize(new Dimension(220, 60));
 		pananalyse.add(startBouton_analyse);
@@ -156,59 +161,77 @@ public class Fenetre extends JFrame {
 
 		startBouton_analyse.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
-					cancelBouton_analyse.setEnabled(true);
-					startBouton_analyse.setEnabled(false);
-					AnalyseData analyse = new AnalyseData();
-					thread_analyse = new Thread(analyse);
-					thread_analyse.start();
+
+				cancelBouton_analyse.setEnabled(true);
+				startBouton_analyse.setEnabled(false);
+				AnalyseData analyse = new AnalyseData();
+				thread_analyse = new Thread(analyse);
+				thread_analyse.start();
 				// thread_analyse.suspend();
 				// thread_analyse.resume();
 
 			}
 		});
 
-		
 		// CENTRE
-		JPanel panCentre = new JPanel();
-		
+		panCentre = new JPanel();
+
 		panCentre.setPreferredSize(new Dimension(480, 120));
 		panCentre.setBorder(BorderFactory.createTitledBorder("Statistiques"));
-		Statistique statistique=new Statistique();
-		statistique.getStatistique();
-		final JLabel count_Label = new JLabel("<html>Nombre de tweets : "+statistique.count+"<br/>"+"Nombre de tweets analysés : "+statistique.count_analysed+"<br/>"+"Nombre d'utilisateurs : "+statistique.count_user+"</html>",SwingConstants.LEFT);
+		Statistique statistique = new Statistique();
+		// statistique.getStatistique();
+		final JLabel count_Label = new JLabel("<html>Nombre de tweets : "
+				+ statistique.count + "<br/>" + "Nombre de tweets analysés : "
+				+ statistique.count_analysed + "<br/>"
+				+ "Nombre d'utilisateurs : " + statistique.count_user
+				+ "</html>", SwingConstants.LEFT);
 		panCentre.add(count_Label);
-		//panCentre.add(startBouton_statistique);
+		// panCentre.add(startBouton_statistique);
 
 		startBouton_statistique.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {				
-				Statistique statistique=new Statistique();
+			public void actionPerformed(ActionEvent arg0) {
+				Statistique statistique = new Statistique();
 				statistique.getStatistique();
-				count_Label.setText("<html>Nombre de tweets : "+statistique.count+"<br/>"+"Nombre de tweets analysés : "+statistique.count_analysed+"<br/>"+"Nombre d'utilisateurs : "+statistique.count_user+"</html>");
+				count_Label.setText("<html>Nombre de tweets : "
+						+ statistique.count + "<br/>"
+						+ "Nombre de tweets analysés : "
+						+ statistique.count_analysed + "<br/>"
+						+ "Nombre d'utilisateurs : " + statistique.count_user
+						+ "</html>");
 			}
 		});
-		final Timer updater = new Timer(3000, new ActionListener() {
-		    public void actionPerformed(ActionEvent e) {
-		    	Statistique statistique=new Statistique();
-				statistique.getStatistique();
-				count_Label.setText("<html>Nombre de tweets : "+statistique.count+"<br/>"+"Nombre de tweets analysés : "+statistique.count_analysed+"<br/>"+"Nombre d'utilisateurs : "+statistique.count_user+"</html>");
-		    }
-		});	
-        updater.start();
+		updater = new Timer(3000, new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (cancelBouton_analyse.isEnabled()
+						|| cancelBouton_rest.isEnabled()
+						|| cancelBouton_stream.isEnabled()) {
+					Statistique statistique = new Statistique();
+					statistique.getStatistique();
+					count_Label.setText("<html>Nombre de tweets : "
+							+ statistique.count + "<br/>"
+							+ "Nombre de tweets analysés : "
+							+ statistique.count_analysed + "<br/>"
+							+ "Nombre d'utilisateurs : "
+							+ statistique.count_user + "</html>");
+				}
+			}
+		});
+		updater.start();
 
 		// DROITE
 		panDroite = new JPanel();
 		panDroite.setPreferredSize(new Dimension(480, 480));
 		panDroite.setBorder(BorderFactory.createTitledBorder("Visualisation"));
 
-        panDroite.add(startBouton_visualisation);
-        mettre_a_jour_graph();
-        startBouton_visualisation.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {				
-				mettre_a_jour_graph();
+		panDroite.add(startBouton_visualisation);
+		mettre_a_jour_graph(false);
+		startBouton_visualisation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				mettre_a_jour_graph(true);
+				// panDroite.add(startBouton_visualisation);
 			}
 		});
-        
+
 		this.getContentPane().add(panDroite, BorderLayout.EAST);
 		this.getContentPane().add(panCentre, BorderLayout.SOUTH);
 		this.getContentPane().add(panGauche, BorderLayout.WEST);
@@ -216,47 +239,56 @@ public class Fenetre extends JFrame {
 		this.setVisible(true);
 
 	}
-	
-	public void mettre_a_jour_graph(){
 
-		Visualisation visualisation=new Visualisation();
+	public void mettre_a_jour_graph(boolean update) {
+
+		Visualisation visualisation = new Visualisation();
 		visualisation.getVisualisation();
-		
+
 		int size = visualisation.count_user;
-        double x;
-        double y;
-        double z;
-        float a;
-        
-        Coord3d[] points = new Coord3d[size];
-        Color[]   colors = new Color[size];
-        
-        for(int i=0; i<size; i++){
-//            x = (float)Math.random() - 0.5f;
-//            y = (float)Math.random() - 0.5f;
-//            z = (float)Math.random() - 0.5f;
-        	x=visualisation.agressiveness[i];
-        	y=visualisation.visibility[i];
-        	z=visualisation.danger[i];
-            points[i] = new Coord3d(x, y, z);
-            a = 0.25f;
-            colors[i] = new Color(255, 0, 0);
-        }
-        
-        Scatter scatter = new Scatter(points, colors);
-        //scatter.setWidth(2);
-        Chart chart = new Chart(Quality.Advanced,"awt");
-        chart.getScene().add(scatter);
-        Component com=(Component)chart.getCanvas();
-        com.setPreferredSize(new Dimension(320, 320));
-        System.out.println(com.getPreferredSize());
-        panDroite.add(com, BorderLayout.EAST);		
+		double x;
+		double y;
+		double z;
+		float a;
+
+		Coord3d[] points = new Coord3d[size];
+		Color[] colors = new Color[size];
+
+		for (int i = 0; i < size; i++) {
+			x = visualisation.agressiveness[i];
+			y = visualisation.visibility[i];
+			z = visualisation.danger[i];
+			// x = (float)Math.random() - 0.5f;
+			// y = (float)Math.random() - 0.5f;
+			// z = (float)Math.random() - 0.5f;
+
+			points[i] = new Coord3d(x, y, z);
+			a = 0.25f;
+			colors[i] = new Color(255, 0, 0);
+		}
+
+		Scatter scatter = new Scatter(points, colors);
+		// scatter.setWidth(2);
+		Chart chart = new Chart(Quality.Advanced, "awt");
+		chart.getScene().add(scatter);
+		if (update) {
+			panDroite.remove(com);
+			// this.remove(panDroite);
+			panDroite.revalidate();
+		}
+		com = (Component) chart.getCanvas();
+		com.setPreferredSize(new Dimension(320, 320));
+		System.out.println(com.getPreferredSize());
+		panDroite.add(com, BorderLayout.EAST);
+		if (update) {
+			this.repaint();
+			// this.getContentPane().add(panDroite, BorderLayout.EAST);
+		}
 	}
 
 	public static void main(String[] args) {
 		Fenetre fenetre = new Fenetre();
 
 	}
-
 
 }
