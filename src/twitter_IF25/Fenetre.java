@@ -38,17 +38,18 @@ public class Fenetre extends JFrame {
 	private JButton startBouton_statistique = new JButton("Mettre à jour");
 	private JButton startBouton_visualisation = new JButton("Mettre à jour");
 	private JPanel panDroite, panGauche, panCentre, panRest, panstream,
-			pananalyse;
+			pananalyse, panUpdate_graph;
 	private Component com;
 	private Timer updater;
 	private JTextField mot_cle;
 	private JLabel mot_cle_Label;
+	private JComboBox[] coordinate_Boxs;
 
 	public Fenetre() {
 		AnalyseData analyse = new AnalyseData();
 		// StreamTweets stream = new StreamTweets();
 		this.setTitle("IF25");
-		this.setSize(720, 480);
+		this.setSize(820, 480);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		this.setLocationRelativeTo(null);
 		this.setResizable(false);
@@ -60,14 +61,14 @@ public class Fenetre extends JFrame {
 		mot_cle.setPreferredSize(new Dimension(100, 25));
 
 		panGauche = new JPanel();
-		panGauche.setPreferredSize(new Dimension(240, 120));
+		panGauche.setPreferredSize(new Dimension(220, 120));
 		panGauche.setBorder(BorderFactory.createTitledBorder("Actions"));
 
 		// REST
 		cancelBouton_rest.setEnabled(false);
 		panRest = new JPanel();
 		panRest.setBorder(BorderFactory.createTitledBorder("REST API"));
-		panRest.setPreferredSize(new Dimension(220, 90));
+		panRest.setPreferredSize(new Dimension(210, 90));
 		panRest.add(mot_cle_Label);
 		panRest.add(mot_cle);
 		panRest.add(startBouton_rest);
@@ -106,7 +107,7 @@ public class Fenetre extends JFrame {
 		cancelBouton_stream.setEnabled(false);
 		panstream = new JPanel();
 		panstream.setBorder(BorderFactory.createTitledBorder("STREAM API"));
-		panstream.setPreferredSize(new Dimension(220, 60));
+		panstream.setPreferredSize(new Dimension(210, 60));
 		panstream.add(startBouton_stream);
 		panstream.add(cancelBouton_stream);
 		panGauche.add(panstream);
@@ -143,7 +144,7 @@ public class Fenetre extends JFrame {
 		cancelBouton_analyse.setEnabled(false);
 		pananalyse = new JPanel();
 		pananalyse.setBorder(BorderFactory.createTitledBorder("ANALYSE API"));
-		pananalyse.setPreferredSize(new Dimension(220, 60));
+		pananalyse.setPreferredSize(new Dimension(210, 60));
 		pananalyse.add(startBouton_analyse);
 		pananalyse.add(cancelBouton_analyse);
 		panGauche.add(pananalyse);
@@ -179,7 +180,7 @@ public class Fenetre extends JFrame {
 		panCentre.setPreferredSize(new Dimension(480, 120));
 		panCentre.setBorder(BorderFactory.createTitledBorder("Statistiques"));
 		Statistique statistique = new Statistique();
-		// statistique.getStatistique();
+		statistique.getStatistique();
 		final JLabel count_Label = new JLabel("<html>Nombre de tweets : "
 				+ statistique.count + "<br/>" + "Nombre de tweets analysés : "
 				+ statistique.count_analysed + "<br/>"
@@ -220,10 +221,44 @@ public class Fenetre extends JFrame {
 
 		// DROITE
 		panDroite = new JPanel();
-		panDroite.setPreferredSize(new Dimension(480, 480));
+		panDroite.setPreferredSize(new Dimension(600, 480));
 		panDroite.setBorder(BorderFactory.createTitledBorder("Visualisation"));
+		panUpdate_graph = new JPanel();
+		coordinate_Boxs = new JComboBox[3];
 
-		panDroite.add(startBouton_visualisation);
+		for (int i = 0; i < 3; i++) {
+			coordinate_Boxs[i] = new JComboBox();
+			coordinate_Boxs[i].addItem("agressiveness");
+			coordinate_Boxs[i].addItem("visibility");
+			coordinate_Boxs[i].addItem("danger");
+			coordinate_Boxs[i].addItem("count_mention");
+			coordinate_Boxs[i].addItem("count_hashtag");
+			coordinate_Boxs[i].addItem("count_malware_link");
+			coordinate_Boxs[i].addItem("friends_count");
+			coordinate_Boxs[i].addItem("followers_count");
+			JLabel coordinate_JLabel;
+			if (i == 0) {
+				coordinate_JLabel = new JLabel("Coordonnée X :");
+				coordinate_Boxs[i].setSelectedItem("agressiveness");
+			} else if (i == 1) {
+				coordinate_JLabel = new JLabel("Coordonnée Y :");
+				coordinate_Boxs[i].setSelectedItem("visibility");
+			} else if (i == 2) {
+				coordinate_JLabel = new JLabel("Coordonnée Z :");
+				coordinate_Boxs[i].setSelectedItem("danger");
+			} else {
+				coordinate_JLabel = new JLabel("Coordonnée :");
+				coordinate_Boxs[i].setSelectedItem("agressiveness");
+			}
+			panUpdate_graph.add(coordinate_JLabel);
+			panUpdate_graph.add(coordinate_Boxs[i]);
+		}
+
+		panUpdate_graph.add(startBouton_visualisation);
+		panUpdate_graph.setBorder(BorderFactory
+				.createTitledBorder("Les coordonnées"));
+		panUpdate_graph.setPreferredSize(new Dimension(200, 300));
+		panDroite.add(panUpdate_graph);
 		mettre_a_jour_graph(false);
 		startBouton_visualisation.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -246,29 +281,51 @@ public class Fenetre extends JFrame {
 		visualisation.getVisualisation();
 
 		int size = visualisation.count_user;
-		double x;
-		double y;
-		double z;
 		float a;
 
 		Coord3d[] points = new Coord3d[size];
 		Color[] colors = new Color[size];
+		double[][] coordinate = new double[3][size];
+		String[] string_coordinate = new String[3];
+		for (int i = 0; i < 3; i++) {
+			string_coordinate[i] = (String) coordinate_Boxs[i]
+					.getSelectedItem();
+			if (string_coordinate[i].equals("agressiveness"))
+				coordinate[i] = visualisation.agressiveness;
+			else if (string_coordinate[i].equals("visibility"))
+				coordinate[i] = visualisation.visibility;
+			else if (string_coordinate[i].equals("danger"))
+				coordinate[i] = visualisation.danger;
+			else if (string_coordinate[i].equals("count_mention"))
+				coordinate[i] = visualisation.count_mention;
+			else if (string_coordinate[i].equals("count_hashtag"))
+				coordinate[i] = visualisation.count_hashtag;
+			else if (string_coordinate[i].equals("count_malware_link"))
+				coordinate[i] = visualisation.count_malware_link;
+			else if (string_coordinate[i].equals("friends_count"))
+				coordinate[i] = visualisation.friends_count;
+			else if (string_coordinate[i].equals("followers_count"))
+				coordinate[i] = visualisation.followers_count;
+			else {
+				coordinate[i] = visualisation.agressiveness;
+			}
+		}
+		
 
 		for (int i = 0; i < size; i++) {
-			x = visualisation.agressiveness[i];
-			y = visualisation.visibility[i];
-			z = visualisation.danger[i];
+
+		
 			// x = (float)Math.random() - 0.5f;
 			// y = (float)Math.random() - 0.5f;
 			// z = (float)Math.random() - 0.5f;
 
-			points[i] = new Coord3d(x, y, z);
+			points[i] = new Coord3d(coordinate[0][i], coordinate[1][i], coordinate[2][i]);
 			a = 0.25f;
 			colors[i] = new Color(255, 0, 0);
 		}
 
 		Scatter scatter = new Scatter(points, colors);
-		// scatter.setWidth(2);
+		scatter.setWidth(2);
 		Chart chart = new Chart(Quality.Advanced, "awt");
 		chart.getScene().add(scatter);
 		if (update) {

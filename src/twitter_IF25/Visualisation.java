@@ -25,7 +25,7 @@ import java.util.Observable;
 import org.apache.commons.lang.StringUtils;
 
 public class Visualisation {
-	public double[] agressiveness, visibility, danger;
+	public double[] agressiveness, visibility, danger, count_mention,count_hashtag,count_malware_link,friends_count,followers_count;
 	public int count_user;
 
 	public void getVisualisation() {
@@ -35,30 +35,29 @@ public class Visualisation {
 		DBCollection coll_users = db.getCollection("users");
 		DBCursor cursor_user = coll_users.find();
 		int count = 0;
-		count_user=(int)coll_users.getCount();
-		agressiveness=new double[count_user];
-		visibility=new double[count_user];
-		danger=new double[count_user];
+		count_user = (int) coll_users.getCount();
+		agressiveness = new double[count_user];
+		visibility = new double[count_user];
+		danger = new double[count_user];
+		count_mention = new double[count_user];
+		count_hashtag = new double[count_user];
+		count_malware_link = new double[count_user];
+		friends_count = new double[count_user];
+		followers_count = new double[count_user];
 		System.out.println(count_user);
 		try {
 			while (cursor_user.hasNext()) {
 				BasicDBObject user = (BasicDBObject) cursor_user.next();
-				//System.out.println(count+"a"+user.toString());
-				if (user.get("agressiveness") == null) {
-					agressiveness[count] = 0;
-				} else {					
-					agressiveness[count] = (double) user.get("agressiveness");
-				}
-				if (user.get("visibility") == null) {
-					visibility[count] = 0;
-				} else {
-					visibility[count] = (double) user.get("visibility");
-				}
-				if (user.get("danger") == null) {
-					danger[count] = 0;
-				} else {
-					danger[count] = (double) user.get("danger");
-				}
+				// System.out.println(count+"a"+user.toString());
+				agressiveness[count] = (double) user.get("agressiveness");
+				visibility[count] = (double) user.get("visibility");
+				danger[count] = (double) user.get("danger");
+				count_mention[count] = (double) ((int)user.get("count_mention"));
+				count_hashtag[count] = (double) ((int)user.get("count_hashtag"));
+				count_malware_link[count] = (double) ((int)user.get("count_malware_link"));
+				friends_count[count] = (double) ((int)user.get("friends_count"));
+				followers_count[count] = (double) ((int)user.get("followers_count"));
+				//System.out.println(followers_count[count]);
 				count++;
 			}
 		} finally {
