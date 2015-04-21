@@ -26,7 +26,7 @@ import org.apache.commons.lang.StringUtils;
 
 
 public class Statistique  {
-	public int count,count_user,count_analysed;
+	public int count,count_user,count_analysed,count_spam,count_verified;
 	public void getStatistique() {
 		MongoClient mongoClient = new MongoClient("localhost");
 
@@ -41,7 +41,13 @@ public class Statistique  {
 		count=(int)coll_tweets.getCount();
 		count_user=(int)coll_users.getCount();
 		count_analysed=(int)coll_tweets.getCount(notQuery);
-		System.out.println(count_analysed+"-"+count+"-"+count_user);
+		BasicDBObject spamQuery = new BasicDBObject();
+		spamQuery.append("user_class",-1);
+		count_spam=(int)coll_users.getCount(spamQuery);
+		BasicDBObject verifiedQuery = new BasicDBObject();
+		verifiedQuery.append("user_class",1);
+		count_verified=(int)coll_users.getCount(verifiedQuery);
+		System.out.println(count+"-"+count_analysed+"-"+count_user+"-"+count_spam+"-"+count_verified);
 		
 	}	
 	public static void main(String[] args) throws IOException {

@@ -8,7 +8,21 @@ public class User {
 	int count_mention;
 	int count_tweet_analysed;
 	int count_malware_link;
+	int friends_count;
+	int followers_count;
 	
+	public int getFriends_count() {
+		return friends_count;
+	}
+	public void setFriends_count(int friends_count) {
+		this.friends_count = friends_count;
+	}
+	public int getFollowers_count() {
+		return followers_count;
+	}
+	public void setFollowers_count(int followers_count) {
+		this.followers_count = followers_count;
+	}
 	public int getCount_malware_link() {
 		return count_malware_link;
 	}

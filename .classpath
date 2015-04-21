@@ -12,5 +12,6 @@
 	<classpathentry kind="lib" path="/home/mai/Downloads/org.jzy3d-0.9-tutorials/lib/org.jzy3d-0.9.jar"/>
 	<classpathentry kind="lib" path="/home/mai/Downloads/org.jzy3d-0.9-tutorials/lib/jogl2-rc10/jogl-all.jar"/>
 	<classpathentry kind="lib" path="/home/mai/Downloads/org.jzy3d-0.9-tutorials/lib/jogl2-rc10/gluegen-rt.jar"/>
+	<classpathentry kind="lib" path="/home/mai/workspace/svm/src/libsvm.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

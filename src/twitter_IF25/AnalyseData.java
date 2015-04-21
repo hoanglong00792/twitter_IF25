@@ -9,9 +9,12 @@ import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -25,16 +28,36 @@ import java.util.Observable;
 import org.apache.commons.lang.StringUtils;
 
 public class AnalyseData extends Observable implements Runnable {
+	public boolean is_train;
+	public DBCollection coll_tweets;
+	public DBCollection coll_users;
+	public int group_id;
+
+	public AnalyseData(int group_id) {
+		this.group_id = group_id;
+	}
+
 	@Override
 	public void run() {
 		MongoClient mongoClient = new MongoClient("localhost");
 
 		DB db = mongoClient.getDB("tweetdata");
-
-		DBCollection coll_tweets = db.getCollection("tweets");
-		// BasicDBObject query = new BasicDBObject("user.screen_name",
+		if (group_id == 1) {
+			coll_tweets = db.getCollection("tweets_train_verified");
+		} else if (group_id == 2) {
+			coll_tweets = db.getCollection("tweets_train_spam");
+		} else {
+			coll_tweets = db.getCollection("tweets");
+		} // BasicDBObject query = new BasicDBObject("user.screen_name",
 		// "JackiePollaert");
-		DBCollection coll_users = db.getCollection("users");
+		if (group_id == 1) {
+			coll_users = db.getCollection("users_train_verified");
+		} else if (group_id == 2) {
+			coll_users = db.getCollection("users_train_spam");
+		} else {
+			coll_users = db.getCollection("users");
+		}
+		System.out.println(group_id);
 		BasicDBObject notQuery = new BasicDBObject();
 		notQuery.put("read", new BasicDBObject("$exists", false));
 		DBCursor cursor = coll_tweets.find(notQuery);
@@ -65,7 +88,8 @@ public class AnalyseData extends Observable implements Runnable {
 						.append("count_malware_link",
 								new_user.getCount_malware_link())
 						.append("count_tweet_analysed",
-								new_user.getCount_tweet_analysed());
+								new_user.getCount_tweet_analysed())
+						.append("user_class",group_id);
 				coll_users.insert(doc);
 				tweet.append("read", 1);
 				coll_tweets.save(tweet);
@@ -130,21 +154,15 @@ public class AnalyseData extends Observable implements Runnable {
 		double danger = 0;
 		boolean is_malware = false;
 		int count_malware_link = new_user.getCount_malware_link();
-		BasicDBObject entities = (BasicDBObject) tweet.get("entities");
-		BasicDBList list_urls = (BasicDBList) entities.get("urls");
-		for (Object object : list_urls) {
-			DBObject embedded = (DBObject) object;
-			System.out.println(embedded.get("expanded_url"));
-			String link = (String) embedded.get("expanded_url");
-			//link = "http://ianfette.org";
-			if (AnalyseData.check_link(link)) {
-				is_malware = true;
-			}
-			;
-		}
-		if (is_malware) {
-			count_malware_link++;
-		}
+		/*
+		 * BasicDBObject entities = (BasicDBObject) tweet.get("entities");
+		 * BasicDBList list_urls = (BasicDBList) entities.get("urls"); for
+		 * (Object object : list_urls) { DBObject embedded = (DBObject) object;
+		 * System.out.println(embedded.get("expanded_url")); String link =
+		 * (String) embedded.get("expanded_url"); // link =
+		 * "http://ianfette.org"; if (AnalyseData.check_link(link)) { is_malware
+		 * = true; } } if (is_malware) { count_malware_link++; }
+		 */
 		int count_tweet_analysed = new_user.getCount_tweet_analysed();
 		danger = count_malware_link / count_tweet_analysed;
 		new_user.setDanger(danger);
@@ -159,6 +177,7 @@ public class AnalyseData extends Observable implements Runnable {
 
 		String user_created_at = (String) user.get("created_at");
 		int friends_count = (int) user.get("friends_count");
+		int followers_count = (int) user.get("followers_count");
 		int tweets_count = (int) user.get("statuses_count");
 
 		DateFormat inputFormat = new SimpleDateFormat(
@@ -176,6 +195,8 @@ public class AnalyseData extends Observable implements Runnable {
 		}
 		Double agressiveness = ((tweets_count + friends_count) / diff) / 350;
 		new_user.setAgressiveness(agressiveness);
+		new_user.setFollowers_count(followers_count);
+		new_user.setFriends_count(friends_count);
 		return new_user;
 	}
 
@@ -236,8 +257,9 @@ public class AnalyseData extends Observable implements Runnable {
 		return is_malware;
 	}
 
+
 	public static void main(String[] args) throws IOException {
-		AnalyseData analyse = new AnalyseData();
+		AnalyseData analyse = new AnalyseData(0);
 		analyse.run();
 	}
 }

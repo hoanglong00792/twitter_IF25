@@ -28,7 +28,7 @@ import org.jzy3d.plot3d.primitives.Scatter;
 import org.jzy3d.plot3d.rendering.canvas.Quality;
 
 public class Fenetre extends JFrame {
-	private Thread thread_rest, thread_stream, thread_analyse;
+	private Thread thread_rest, thread_stream, thread_analyse, thread_SVM;
 	private JButton startBouton_rest = new JButton("Démarrer");
 	private JButton cancelBouton_rest = new JButton("Arrêter");
 	private JButton startBouton_stream = new JButton("Démarrer");
@@ -37,16 +37,19 @@ public class Fenetre extends JFrame {
 	private JButton cancelBouton_analyse = new JButton("Arrêter");
 	private JButton startBouton_statistique = new JButton("Mettre à jour");
 	private JButton startBouton_visualisation = new JButton("Mettre à jour");
+	private JButton startBouton_SVM = new JButton("Démarrer");
+	private JButton cancelBouton_SVM = new JButton("Arrêter");
 	private JPanel panDroite, panGauche, panCentre, panRest, panstream,
-			pananalyse, panUpdate_graph;
+			pananalyse, panUpdate_graph, panSVM;
 	private Component com;
 	private Timer updater;
 	private JTextField mot_cle;
 	private JLabel mot_cle_Label;
 	private JComboBox[] coordinate_Boxs;
+	private JComboBox group_Boxs;
 
 	public Fenetre() {
-		AnalyseData analyse = new AnalyseData();
+		// AnalyseData analyse = new AnalyseData(false);
 		// StreamTweets stream = new StreamTweets();
 		this.setTitle("IF25");
 		this.setSize(820, 480);
@@ -93,7 +96,8 @@ public class Fenetre extends JFrame {
 				} else {
 					cancelBouton_rest.setEnabled(true);
 					startBouton_rest.setEnabled(false);
-					SearchTweets search = new SearchTweets(mot_cle.getText());
+					SearchTweets search = new SearchTweets(mot_cle.getText(),
+							false);
 					thread_rest = new Thread(search);
 					thread_rest.start();
 				}
@@ -165,7 +169,7 @@ public class Fenetre extends JFrame {
 
 				cancelBouton_analyse.setEnabled(true);
 				startBouton_analyse.setEnabled(false);
-				AnalyseData analyse = new AnalyseData();
+				AnalyseData analyse = new AnalyseData(0);
 				thread_analyse = new Thread(analyse);
 				thread_analyse.start();
 				// thread_analyse.suspend();
@@ -174,46 +178,98 @@ public class Fenetre extends JFrame {
 			}
 		});
 
+		// SVM
+		cancelBouton_SVM.setEnabled(false);
+		panSVM = new JPanel();
+		panSVM.setBorder(BorderFactory.createTitledBorder("SVM"));
+		panSVM.setPreferredSize(new Dimension(210, 60));
+		panSVM.add(startBouton_SVM);
+		panSVM.add(cancelBouton_SVM);
+		panGauche.add(panSVM);
+
+		cancelBouton_SVM.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				// setVisible(false);
+				// GUIAccueil guiAccueil= new GUIAccueil();
+				// guiAccuei-l.setVisible(true);
+				cancelBouton_SVM.setEnabled(false);
+				startBouton_SVM.setEnabled(true);
+				thread_SVM.suspend();
+			}
+		});
+
+		startBouton_SVM.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				cancelBouton_SVM.setEnabled(true);
+				startBouton_SVM.setEnabled(false);
+				ClassifierSVM SVM = new ClassifierSVM();
+				thread_SVM = new Thread(SVM);
+				thread_SVM.start();
+				// thread_SVM.suspend();
+				// thread_SVM.resume();
+
+			}
+		});
+
 		// CENTRE
 		panCentre = new JPanel();
 
-		panCentre.setPreferredSize(new Dimension(480, 120));
+		panCentre.setPreferredSize(new Dimension(560, 120));
 		panCentre.setBorder(BorderFactory.createTitledBorder("Statistiques"));
 		Statistique statistique = new Statistique();
 		statistique.getStatistique();
 		final JLabel count_Label = new JLabel("<html>Nombre de tweets : "
-				+ statistique.count + "<br/>" + "Nombre de tweets analysés : "
+				+ statistique.count + " " + "dont analysés : "
 				+ statistique.count_analysed + "<br/>"
-				+ "Nombre d'utilisateurs : " + statistique.count_user
-				+ "</html>", SwingConstants.LEFT);
+				+ "Nombre d'utilisateurs : " + statistique.count_user + " "
+				+ "dont soupçonneux  : " + statistique.count_spam + " "
+				+ "et vérifiés  : " + statistique.count_verified + "</html>",
+				SwingConstants.LEFT);
 		panCentre.add(count_Label);
 		// panCentre.add(startBouton_statistique);
 
-		startBouton_statistique.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) {
-				Statistique statistique = new Statistique();
-				statistique.getStatistique();
-				count_Label.setText("<html>Nombre de tweets : "
-						+ statistique.count + "<br/>"
-						+ "Nombre de tweets analysés : "
-						+ statistique.count_analysed + "<br/>"
-						+ "Nombre d'utilisateurs : " + statistique.count_user
-						+ "</html>");
-			}
-		});
+		// startBouton_statistique.addActionListener(new ActionListener() {
+		// public void actionPerformed(ActionEvent arg0) {
+		// Statistique statistique = new Statistique();
+		// statistique.getStatistique();
+		// count_Label.setText("<html>Nombre de tweets : "
+		// + statistique.count + " "
+		// + "Nombre de tweets analysés : "
+		// + statistique.count_analysed + "<br/>"
+		// + "Nombre d'utilisateurs : "
+		// + statistique.count_user +" "
+		// + "Nombre d'utilisateurs soupçonneux  : "
+		// + statistique.count_spam + " "
+		// + "Nombre d'utilisateurs vérifiés  : "
+		// + statistique.count_verified +
+		// "</html>");
+		// }
+		// });
 		updater = new Timer(3000, new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (cancelBouton_analyse.isEnabled()
 						|| cancelBouton_rest.isEnabled()
-						|| cancelBouton_stream.isEnabled()) {
+						|| cancelBouton_stream.isEnabled()
+						|| cancelBouton_SVM.isEnabled()) {
 					Statistique statistique = new Statistique();
 					statistique.getStatistique();
+					if (statistique.count == statistique.count_analysed) {
+						cancelBouton_analyse.setEnabled(false);
+						startBouton_analyse.setEnabled(true);
+					}
+					if (statistique.count_verified + statistique.count_spam == statistique.count_user) {
+						cancelBouton_SVM.setEnabled(false);
+						startBouton_SVM.setEnabled(true);
+					}
 					count_Label.setText("<html>Nombre de tweets : "
-							+ statistique.count + "<br/>"
-							+ "Nombre de tweets analysés : "
+							+ statistique.count + " " + "dont analysés : "
 							+ statistique.count_analysed + "<br/>"
 							+ "Nombre d'utilisateurs : "
-							+ statistique.count_user + "</html>");
+							+ statistique.count_user + " "
+							+ "dont soupçonneux  : " + statistique.count_spam
+							+ " " + "et vérifiés  : "
+							+ statistique.count_verified + "</html>");
 				}
 			}
 		});
@@ -225,15 +281,14 @@ public class Fenetre extends JFrame {
 		panDroite.setBorder(BorderFactory.createTitledBorder("Visualisation"));
 		panUpdate_graph = new JPanel();
 		coordinate_Boxs = new JComboBox[3];
-
 		for (int i = 0; i < 3; i++) {
 			coordinate_Boxs[i] = new JComboBox();
 			coordinate_Boxs[i].addItem("agressiveness");
 			coordinate_Boxs[i].addItem("visibility");
 			coordinate_Boxs[i].addItem("danger");
-			coordinate_Boxs[i].addItem("count_mention");
-			coordinate_Boxs[i].addItem("count_hashtag");
-			coordinate_Boxs[i].addItem("count_malware_link");
+			coordinate_Boxs[i].addItem("mention_per_tweet");
+			coordinate_Boxs[i].addItem("hashtag_per_tweet");
+			coordinate_Boxs[i].addItem("malware_link_per_tweet");
 			coordinate_Boxs[i].addItem("friends_count");
 			coordinate_Boxs[i].addItem("followers_count");
 			JLabel coordinate_JLabel;
@@ -253,11 +308,17 @@ public class Fenetre extends JFrame {
 			panUpdate_graph.add(coordinate_JLabel);
 			panUpdate_graph.add(coordinate_Boxs[i]);
 		}
-
+		JLabel group_JLabel = new JLabel("Filtre :");
+		group_Boxs = new JComboBox();
+		group_Boxs.addItem("Tout");
+		group_Boxs.addItem("Les utilisateurs soupçonneux");
+		group_Boxs.addItem("Les utilisateurs vérifiés");
+		panUpdate_graph.add(group_JLabel);
+		panUpdate_graph.add(group_Boxs);
 		panUpdate_graph.add(startBouton_visualisation);
 		panUpdate_graph.setBorder(BorderFactory
 				.createTitledBorder("Les coordonnées"));
-		panUpdate_graph.setPreferredSize(new Dimension(200, 300));
+		panUpdate_graph.setPreferredSize(new Dimension(250, 300));
 		panDroite.add(panUpdate_graph);
 		mettre_a_jour_graph(false);
 		startBouton_visualisation.addActionListener(new ActionListener() {
@@ -266,18 +327,27 @@ public class Fenetre extends JFrame {
 				// panDroite.add(startBouton_visualisation);
 			}
 		});
-
 		this.getContentPane().add(panDroite, BorderLayout.EAST);
-		this.getContentPane().add(panCentre, BorderLayout.SOUTH);
 		this.getContentPane().add(panGauche, BorderLayout.WEST);
+		// this.getContentPane().add(panCentre, BorderLayout.SOUTH);
 
 		this.setVisible(true);
 
 	}
 
 	public void mettre_a_jour_graph(boolean update) {
+		Visualisation visualisation;
+		if (group_Boxs.getSelectedItem()
+				.equals("Les utilisateurs vérifiés")) {
+			visualisation= new Visualisation(3);
+		} else if (group_Boxs.getSelectedItem().equals(
+				"Les utilisateurs soupçonneux")) {
+			visualisation= new Visualisation(4);
+		}else{
+			visualisation= new Visualisation(0);
+		}
 
-		Visualisation visualisation = new Visualisation();
+		 
 		visualisation.getVisualisation();
 
 		int size = visualisation.count_user;
@@ -296,12 +366,12 @@ public class Fenetre extends JFrame {
 				coordinate[i] = visualisation.visibility;
 			else if (string_coordinate[i].equals("danger"))
 				coordinate[i] = visualisation.danger;
-			else if (string_coordinate[i].equals("count_mention"))
-				coordinate[i] = visualisation.count_mention;
-			else if (string_coordinate[i].equals("count_hashtag"))
-				coordinate[i] = visualisation.count_hashtag;
-			else if (string_coordinate[i].equals("count_malware_link"))
-				coordinate[i] = visualisation.count_malware_link;
+			else if (string_coordinate[i].equals("mention_per_tweet"))
+				coordinate[i] = visualisation.mention_per_tweet;
+			else if (string_coordinate[i].equals("hashtag_per_tweet"))
+				coordinate[i] = visualisation.hashtag_per_tweet;
+			else if (string_coordinate[i].equals("malware_link_per_tweet"))
+				coordinate[i] = visualisation.malware_link_per_tweet;
 			else if (string_coordinate[i].equals("friends_count"))
 				coordinate[i] = visualisation.friends_count;
 			else if (string_coordinate[i].equals("followers_count"))
@@ -310,18 +380,22 @@ public class Fenetre extends JFrame {
 				coordinate[i] = visualisation.agressiveness;
 			}
 		}
-		
-
 		for (int i = 0; i < size; i++) {
 
-		
 			// x = (float)Math.random() - 0.5f;
 			// y = (float)Math.random() - 0.5f;
 			// z = (float)Math.random() - 0.5f;
 
-			points[i] = new Coord3d(coordinate[0][i], coordinate[1][i], coordinate[2][i]);
+			points[i] = new Coord3d(coordinate[0][i], coordinate[1][i],
+					coordinate[2][i]);
 			a = 0.25f;
-			colors[i] = new Color(255, 0, 0);
+			if (visualisation.user_class[i] == -1) {
+				colors[i] = new Color(255, 0, 0);
+			} else if (visualisation.user_class[i] == 1) {
+				colors[i] = new Color(0, 0, 255);
+			} else {
+				colors[i] = new Color(0, 255, 0);
+			}
 		}
 
 		Scatter scatter = new Scatter(points, colors);
@@ -331,12 +405,14 @@ public class Fenetre extends JFrame {
 		if (update) {
 			panDroite.remove(com);
 			// this.remove(panDroite);
+			panDroite.remove(panCentre);
 			panDroite.revalidate();
 		}
 		com = (Component) chart.getCanvas();
 		com.setPreferredSize(new Dimension(320, 320));
 		System.out.println(com.getPreferredSize());
 		panDroite.add(com, BorderLayout.EAST);
+		panDroite.add(panCentre);
 		if (update) {
 			this.repaint();
 			// this.getContentPane().add(panDroite, BorderLayout.EAST);
